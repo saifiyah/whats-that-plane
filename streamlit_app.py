@@ -6,13 +6,8 @@ import time
 
 st.title("✈️ What's That Plane from DAL?")
 
-# --- Embed FlightAware Live Map ---
-flightaware_embed = """
-<iframe src="https://flightaware.com/live/airport/KDAL/visualizations/flight-tracks?filter=departures"
-    width="700" height="450" frameborder="0" scrolling="no"></iframe>
-"""
-st.markdown("### Live FlightAware Map for Dallas Love Field (DAL)")
-st.components.v1.html(flightaware_embed, height=450, width=700)
+st.markdown("### Live FlightRadar24 Map for Dallas Love Field (DAL)")
+st.markdown("[Click here to open the FlightRadar24 DAL live map](https://www.flightradar24.com/data/airports/dal)")
 
 st.write("Click the button to check current DAL departures heading southwest or preparing for takeoff.")
 
@@ -103,3 +98,7 @@ if st.button("🔎 Find Plane"):
 
             st.write(f"📍 Heading: {heading}°, Altitude: {altitude} ft")
             st.write(f"🌐 Location: ({lat}, {lon})")
+
+            # Flightradar24 tracking link
+            fr24_url = f"https://www.flightradar24.com/{callsign}"
+            st.markdown(f"[🔗 Track {callsign} on FlightRadar24]({fr24_url})")
