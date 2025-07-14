@@ -1,18 +1,23 @@
-# streamlit_app.py
-
 import streamlit as st
 import requests
 import pandas as pd
 from datetime import datetime
 import time
-import folium
-from streamlit_folium import st_folium
 
 st.title("✈️ What's That Plane from DAL?")
-st.write("Click the button to check current departures from Dallas Love Field (DAL) heading southwest or preparing for takeoff.")
+
+# --- Embed FlightAware Live Map ---
+flightaware_embed = """
+<iframe src="https://flightaware.com/live/airport/KDAL/visualizations/flight-tracks?filter=departures"
+    width="700" height="450" frameborder="0" scrolling="no"></iframe>
+"""
+st.markdown("### Live FlightAware Map for Dallas Love Field (DAL)")
+st.components.v1.html(flightaware_embed, height=450, width=700)
+
+st.write("Click the button to check current DAL departures heading southwest or preparing for takeoff.")
 
 if st.button("🔎 Find Plane"):
-    # Step 1: Aircraft positions near DAL
+    # --- 1. Fetch aircraft states near DAL ---
     dal_bounds = {"lamin": 32.83, "lamax": 32.86, "lomin": -96.87, "lomax": -96.84}
     states_url = "https://opensky-network.org/api/states/all"
     r = requests.get(states_url, params=dal_bounds)
@@ -22,8 +27,8 @@ if st.button("🔎 Find Plane"):
         st.stop()
 
     columns = [
-        "icao24", "callsign", "origin_country", "time_position", "last_contact", "longitude", 
-        "latitude", "baro_altitude", "on_ground", "velocity", "heading", "vertical_rate", 
+        "icao24", "callsign", "origin_country", "time_position", "last_contact", "longitude",
+        "latitude", "baro_altitude", "on_ground", "velocity", "heading", "vertical_rate",
         "sensors", "geo_altitude", "squawk", "spi", "position_source"
     ]
     df = pd.DataFrame(r.json()["states"], columns=columns)
@@ -52,7 +57,7 @@ if st.button("🔎 Find Plane"):
     if interesting_planes.empty:
         st.info("No planes currently taking off or preparing for takeoff.")
     else:
-        # Step 2: Get recent departures
+        # --- 2. Get recent departures from DAL (last hour) ---
         end_time = int(time.time())
         start_time = end_time - 3600
         flights_url = f"https://opensky-network.org/api/flights/departure?airport=KDAL&begin={start_time}&end={end_time}"
@@ -81,12 +86,12 @@ if st.button("🔎 Find Plane"):
             heading = round(row["heading"], 1) if row["heading"] else "?"
             altitude = round(row["baro_altitude"], 0) if row["baro_altitude"] else "?"
             lat, lon = row["latitude"], row["longitude"]
-        
+
             match = next((f for f in departures if f["icao24"] == icao), None)
-        
+
             st.markdown("---")
             st.markdown(f"### ✈️ {callsign} ({airline})")
-        
+
             if match:
                 dep = match.get("estDepartureAirport", "Unknown")
                 arr = match.get("estArrivalAirport", "Unknown")
@@ -95,17 +100,6 @@ if st.button("🔎 Find Plane"):
                 st.write(f"⏱️ Takeoff time: {t}")
             else:
                 st.write("📋 No recent departure record found.")
-        
+
             st.write(f"📍 Heading: {heading}°, Altitude: {altitude} ft")
             st.write(f"🌐 Location: ({lat}, {lon})")
-        
-            # Map
-            if lat and lon:
-                m = folium.Map(location=[lat, lon], zoom_start=12)
-                folium.Marker(
-                    location=[lat, lon],
-                    popup=f"{callsign} ({airline})\nHeading: {heading}°\nAlt: {altitude} ft",
-                    tooltip="📍 Plane location"
-                ).add_to(m)
-        
-                st_folium(m, width=700, height=450)
