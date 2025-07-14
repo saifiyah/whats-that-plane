@@ -7,7 +7,7 @@ import time
 st.title("✈️ What's That Plane from DAL?")
 
 st.markdown("### Live FlightRadar24 Map for Dallas Love Field (DAL)")
-st.markdown("[Click here to open the FlightRadar24 DAL live map](https://www.flightradar24.com/data/airports/dal)")
+st.markdown("[Click here to open the FlightRadar24 DAL live map](https://www.flightradar24.com/32.84,-96.85/15)")
 
 st.write("Click the button to check current DAL departures heading southwest or preparing for takeoff.")
 
