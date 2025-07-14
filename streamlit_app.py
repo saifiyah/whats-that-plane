@@ -5,6 +5,8 @@ import requests
 import pandas as pd
 from datetime import datetime
 import time
+import folium
+from streamlit_folium import st_folium
 
 st.title("✈️ What's That Plane from DAL?")
 st.write("Click the button to check current departures from Dallas Love Field (DAL) heading southwest or preparing for takeoff.")
@@ -79,12 +81,12 @@ if st.button("🔎 Find Plane"):
             heading = round(row["heading"], 1) if row["heading"] else "?"
             altitude = round(row["baro_altitude"], 0) if row["baro_altitude"] else "?"
             lat, lon = row["latitude"], row["longitude"]
-
+        
             match = next((f for f in departures if f["icao24"] == icao), None)
-
+        
             st.markdown("---")
             st.markdown(f"### ✈️ {callsign} ({airline})")
-
+        
             if match:
                 dep = match.get("estDepartureAirport", "Unknown")
                 arr = match.get("estArrivalAirport", "Unknown")
@@ -93,6 +95,17 @@ if st.button("🔎 Find Plane"):
                 st.write(f"⏱️ Takeoff time: {t}")
             else:
                 st.write("📋 No recent departure record found.")
-
+        
             st.write(f"📍 Heading: {heading}°, Altitude: {altitude} ft")
             st.write(f"🌐 Location: ({lat}, {lon})")
+        
+            # Map
+            if lat and lon:
+                m = folium.Map(location=[lat, lon], zoom_start=12)
+                folium.Marker(
+                    location=[lat, lon],
+                    popup=f"{callsign} ({airline})\nHeading: {heading}°\nAlt: {altitude} ft",
+                    tooltip="📍 Plane location"
+                ).add_to(m)
+        
+                st_folium(m, width=700, height=450)
