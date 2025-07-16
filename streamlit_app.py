@@ -16,9 +16,10 @@ if st.button("🔎 Find Plane"):
     dal_bounds = {"lamin": 32.83, "lamax": 32.86, "lomin": -96.87, "lomax": -96.84}
     states_url = "https://opensky-network.org/api/states/all"
     r = requests.get(states_url, params=dal_bounds)
-
+    
     if r.status_code != 200:
-        st.error("Failed to fetch aircraft state data.")
+        st.error(f"Failed to fetch aircraft state data. Status code: {r.status_code}")
+        st.text(r.text)
         st.stop()
 
     columns = [
