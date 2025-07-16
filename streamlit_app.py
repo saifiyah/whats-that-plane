@@ -7,22 +7,18 @@ import time
 st.title("✈️ What's That Plane from DAL?")
 
 st.markdown("### Live FlightRadar24 Map for Dallas Love Field (DAL)")
-st.markdown("[Click here to open the FlightRadar24 DAL live map](https://www.flightradar24.com/32.84,-96.85/15)")
+st.markdown("[Click here to open the FlightRadar24 DAL live map](https://www.flightradar24.com/data/airports/dal)")
 
 st.write("Click the button to check current DAL departures heading southwest or preparing for takeoff.")
 
 if st.button("🔎 Find Plane"):
     # --- 1. Fetch aircraft states near DAL ---
-    dal_bounds = {
-    "lamin": 32.80, "lamax": 32.89,  # ~5 miles N-S
-    "lomin": -96.93, "lomax": -96.80  # ~7 miles E-W
-    }
+    dal_bounds = {"lamin": 32.83, "lamax": 32.86, "lomin": -96.87, "lomax": -96.84}
     states_url = "https://opensky-network.org/api/states/all"
     r = requests.get(states_url, params=dal_bounds)
-    
+
     if r.status_code != 200:
-        st.error(f"Failed to fetch aircraft state data. Status code: {r.status_code}")
-        st.text(r.text)
+        st.error("Failed to fetch aircraft state data.")
         st.stop()
 
     columns = [
