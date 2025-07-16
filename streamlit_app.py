@@ -13,7 +13,10 @@ st.write("Click the button to check current DAL departures heading southwest or 
 
 if st.button("🔎 Find Plane"):
     # --- 1. Fetch aircraft states near DAL ---
-    dal_bounds = {"lamin": 32.83, "lamax": 32.86, "lomin": -96.87, "lomax": -96.84}
+    dal_bounds = {
+    "lamin": 32.80, "lamax": 32.89,  # ~5 miles N-S
+    "lomin": -96.93, "lomax": -96.80  # ~7 miles E-W
+    }
     states_url = "https://opensky-network.org/api/states/all"
     r = requests.get(states_url, params=dal_bounds)
     
