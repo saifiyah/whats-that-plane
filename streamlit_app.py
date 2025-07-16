@@ -16,6 +16,23 @@ if st.button("🔎 Find Plane"):
     dal_bounds = {"lamin": 32.83, "lamax": 32.86, "lomin": -96.87, "lomax": -96.84}
     states_url = "https://opensky-network.org/api/states/all"
     r = requests.get(states_url, params=dal_bounds)
+    
+    st.write("🔍 OpenSky State API status code:", r.status_code)
+    
+    if r.status_code == 403:
+        st.error("❌ Access denied (403). You may be rate-limited. Try again later or use login credentials.")
+        st.stop()
+    elif r.status_code != 200:
+        st.error(f"❌ Unexpected response from OpenSky: {r.status_code}")
+        st.stop()
+    
+    data = r.json()
+    num_aircraft = len(data.get("states", []))
+    st.write(f"✈️ Aircraft returned in bounding box: {num_aircraft}")
+    
+    if num_aircraft == 0:
+        st.warning("⚠️ No aircraft currently detected near DAL. This could be due to time of day or API rate limits.")
+        st.stop()
 
     if r.status_code != 200:
         st.error("Failed to fetch aircraft state data.")
